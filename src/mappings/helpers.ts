@@ -1,14 +1,14 @@
 /* eslint-disable prefer-const */
-import { log, BigInt, BigDecimal, Address, EthereumEvent } from '@graphprotocol/graph-ts'
-import { ERC20 } from '../types/Factory/ERC20'
-import { ERC20SymbolBytes } from '../types/Factory/ERC20SymbolBytes'
-import { ERC20NameBytes } from '../types/Factory/ERC20NameBytes'
-import { User, Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair } from '../types/schema'
-import { Factory as FactoryContract } from '../types/templates/Pair/Factory'
+import { log, BigInt, BigDecimal, Address, ethereum } from '@graphprotocol/graph-ts'
+import { BEP20 } from '../../generated/Factory/BEP20'
+import { BEP20SymbolBytes } from '../../generated/Factory/BEP20SymbolBytes'
+import { BEP20NameBytes } from '../../generated/Factory/BEP20NameBytes'
+import { User, Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair } from '../../generated/schema'
+import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { TokenDefinition } from './tokenDefinition'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
+export const FACTORY_ADDRESS = '0xca143ce32fe78f1f7019d7d551a6402fc5350c73'
 
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -59,13 +59,13 @@ export function isNullEthValue(value: string): boolean {
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
   // static definitions overrides
-  let staticDefinition = TokenDefinition.fromAddress(tokenAddress)
-  if(staticDefinition != null) {
-    return (staticDefinition as TokenDefinition).symbol
-  }
+  // let staticDefinition = TokenDefinition.fromAddress(tokenAddress)
+  // if(staticDefinition != null) {
+  //   return (staticDefinition as TokenDefinition).symbol
+  // }
 
-  let contract = ERC20.bind(tokenAddress)
-  let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress)
+  let contract = BEP20.bind(tokenAddress)
+  let contractSymbolBytes = BEP20SymbolBytes.bind(tokenAddress)
 
   // try types string and bytes32 for symbol
   let symbolValue = 'unknown'
@@ -81,7 +81,7 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
   } else {
     symbolValue = symbolResult.value
   }
-
+  
   return symbolValue
 }
 
@@ -92,8 +92,8 @@ export function fetchTokenName(tokenAddress: Address): string {
     return (staticDefinition as TokenDefinition).name
   }
 
-  let contract = ERC20.bind(tokenAddress)
-  let contractNameBytes = ERC20NameBytes.bind(tokenAddress)
+  let contract = BEP20.bind(tokenAddress)
+  let contractNameBytes = BEP20NameBytes.bind(tokenAddress)
 
   // try types string and bytes32 for name
   let nameValue = 'unknown'
@@ -114,7 +114,8 @@ export function fetchTokenName(tokenAddress: Address): string {
 }
 
 export function fetchTokenTotalSupply(tokenAddress: Address): BigInt {
-  let contract = ERC20.bind(tokenAddress)
+  return ZERO_BI
+  let contract = BEP20.bind(tokenAddress)
   let totalSupplyValue = null
   let totalSupplyResult = contract.try_totalSupply()
   if (!totalSupplyResult.reverted) {
@@ -130,7 +131,7 @@ export function fetchTokenDecimals(tokenAddress: Address): BigInt {
     return (staticDefinition as TokenDefinition).decimals
   }
 
-  let contract = ERC20.bind(tokenAddress)
+  let contract = BEP20.bind(tokenAddress)
   // try types uint8 for decimals
   let decimalValue = null
   let decimalResult = contract.try_decimals()
@@ -169,7 +170,7 @@ export function createUser(address: Address): void {
   }
 }
 
-export function createLiquiditySnapshot(position: LiquidityPosition, event: EthereumEvent): void {
+export function createLiquiditySnapshot(position: LiquidityPosition, event: ethereum.Event): void {
   let timestamp = event.block.timestamp.toI32()
   let bundle = Bundle.load('1')
   let pair = Pair.load(position.pair)
