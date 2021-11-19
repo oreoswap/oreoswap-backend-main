@@ -1,4 +1,4 @@
-type UniswapFactory @entity {
+type OreoswapFactory @entity {
   # factory address
   id: ID!
 
