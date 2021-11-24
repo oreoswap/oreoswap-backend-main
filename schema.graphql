@@ -195,17 +195,22 @@ type Swap @entity {
   transaction: Transaction!
   timestamp: BigInt! # need this to pull recent txns for specific token or pair
   pair: Pair!
-
+  pool: Pool!
+  token0: Token!
+  token1: Token!
   # populated from the Swap event
   sender: Bytes!
+  recipient: Bytes!
   from: Bytes! # the EOA that initiated the txn
+  origin: Bytes!
   amount0In: BigDecimal!
   amount1In: BigDecimal!
   amount0Out: BigDecimal!
   amount1Out: BigDecimal!
   to: Bytes!
   logIndex: BigInt
-
+  sqrtPriceX96: BigInt!
+  tick: BigInt!
   # derived info
   amountUSD: BigDecimal!
 }
@@ -215,7 +220,6 @@ type Bundle @entity {
   id: ID!
   ethPrice: BigDecimal! # price of ETH usd
 }
-
 # Data accumulated and condensed into day stats for all of Uniswap
 type UniswapDayData @entity {
   id: ID! # timestamp rounded to current day by dividing by 86400
